@@ -3,19 +3,28 @@ package com.example.counterapp;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-
+import android.media.SoundPool;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.content.Context;
+
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 public class MainActivity extends AppCompatActivity {
-    ConstraintLayout cl;
-    private int countvar=0;
-TextView countText;
-Button resetbtn;
+    ConstraintLayout main;
+    TextView counterVar,mala_count;
+    CircularProgressIndicator progress;
+    private int count=0;
+    int mala=1;
+    Button reset;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,18 +35,37 @@ Button resetbtn;
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        cl=findViewById(R.id.main);
-        countText=findViewById(R.id.countTxt);
-        resetbtn=findViewById(R.id.resetBtn);;
-
-        cl.setOnClickListener(v->{
-            countvar++;
-            countText.setText(String.valueOf(countvar));
+        progress = findViewById(R.id.progress);
+        main= findViewById(R.id.main);
+        counterVar= findViewById(R.id.countTxt);
+        reset = findViewById(R.id.resetBtn);
+        mala_count=findViewById(R.id.mala_count);
+        main.setOnClickListener(v -> {
+            count++;
+            if(count==108){
+               mala++;
+                mala_count.setText(String.valueOf(mala));
+                reset();
+            }
+            counterVar.setText(String.valueOf(count));
+            progress.setProgressCompat(count, true);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(100);
+            }
         });
-        resetbtn.setOnClickListener(v -> {
-                    countvar=0;
-                    countText.setText(String.valueOf(countvar));
-                }
-        );
+        reset.setOnClickListener(v -> {
+            reset();
+        });
+
     }
+    public void reset(){
+        count=0;
+        progress.setProgressCompat(count, true);
+        counterVar.setText(String.valueOf(count));
+    }
+
+
 }
